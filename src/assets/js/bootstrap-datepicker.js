@@ -108,7 +108,8 @@
             this.component = false;
         this.isInline = !this.component && this.element.is('div');
 
-        this.picker = $(DPGlobal.template);
+        console.log('opts from datepicker', options);
+        this.picker = $(DPGlobal.template(options.selectable));
 
         // Checking templates and inserting
         if (this._check_template(this.o.templates.leftArrow)) {
@@ -1040,7 +1041,7 @@
                     if (before === undefined)
                         before = {};
                     else if (typeof before === 'boolean')
-                        before = {enabled: before};
+                        before = {enabled: before, event: before};
                     else if (typeof before === 'string')
                         before = {classes: before};
                     if (before.enabled === false)
@@ -1835,7 +1836,8 @@
             rightArrow: '&#x00BB;'
         },
         showWeekDays: true,
-        eventCls: ''
+        eventCls: "",
+        selectable: false
     };
     var locale_opts = $.fn.datepicker.locale_opts = [
         'format',
@@ -2057,23 +2059,36 @@
             }
             return date.join('');
         },
-        headTemplate: '<thead>' +
-        '<tr>' +
-        '<th colspan="7" class="datepicker-title"></th>' +
-        '</tr>' +
-        '<tr>' +
-        '<th class="prev">' + defaults.templates.leftArrow + '</th>' +
-//Pixium: change template, add selects for months and years
-        '<th colspan="3">' +
-            getSelectMonths() +
-        '</th>' +
-        '<th colspan="2">' +
-            getSelectYears() +
-        '</th>' +
-//---------------
-        '<th class="next">' + defaults.templates.rightArrow + '</th>' +
-        '</tr>' +
-        '</thead>',
+        headTemplate: function(selectable = false) {
+            begin = '<thead>' +
+                '<tr>' +
+                    '<th colspan="7" class="datepicker-title"></th>' +
+                '</tr>' +
+                '<tr>' +
+                '<th class="prev">' + defaults.templates.leftArrow + '</th>';
+            end = '<th class="next">' + defaults.templates.rightArrow + '</th>' +
+            '</tr>' +
+            '</thead>';
+            content = "";
+            if (selectable) {
+                content += '<th colspan="3">' +
+                "<select class='select-months'>";
+                dates['en']['monthsShort'].forEach(
+                    function(elt, index) {
+                        content +=
+                            "<option value='" + index + "'>" +
+                                elt +
+                            "</option>";
+                    });
+                content += "</select></th>";
+                content += "<th colspan='2'><select class='select-years'></select></th>";
+            } else {
+                content += '<th colspan="5" class="datepicker-switch"></th>';
+            }
+
+            return begin + content + end;
+        },
+        
         contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>',
         footTemplate: '<tfoot>' +
         '<tr>' +
@@ -2084,71 +2099,47 @@
         '</tr>' +
         '</tfoot>'
     };
-    DPGlobal.template = '<div class="datepicker">' +
+    DPGlobal.template = function(selectable) {
+        return '<div class="datepicker">' +
         '<div class="datepicker-days">' +
         '<table class="table-condensed">' +
-        DPGlobal.headTemplate +
+        DPGlobal.headTemplate(selectable) +
         '<tbody></tbody>' +
         DPGlobal.footTemplate +
         '</table>' +
         '</div>' +
         '<div class="datepicker-months">' +
         '<table class="table-condensed">' +
-        DPGlobal.headTemplate +
+        DPGlobal.headTemplate(selectable) +
         DPGlobal.contTemplate +
         DPGlobal.footTemplate +
         '</table>' +
         '</div>' +
         '<div class="datepicker-years">' +
         '<table class="table-condensed">' +
-        DPGlobal.headTemplate +
+        DPGlobal.headTemplate(selectable) +
         DPGlobal.contTemplate +
         DPGlobal.footTemplate +
         '</table>' +
         '</div>' +
         '<div class="datepicker-decades">' +
         '<table class="table-condensed">' +
-        DPGlobal.headTemplate +
+        DPGlobal.headTemplate(selectable) +
         DPGlobal.contTemplate +
         DPGlobal.footTemplate +
         '</table>' +
         '</div>' +
         '<div class="datepicker-centuries">' +
         '<table class="table-condensed">' +
-        DPGlobal.headTemplate +
+        DPGlobal.headTemplate(selectable) +
         DPGlobal.contTemplate +
         DPGlobal.footTemplate +
         '</table>' +
         '</div>' +
         '</div>';
+    };
 
     $.fn.datepicker.DPGlobal = DPGlobal;
-
-    //Pixium:
-    //      - Generate month options for template
-    function getSelectMonths() {
-        begin = "<select class='select-months'>";
-        content = "";
-        end = "</select>"
-        month = new Date().getMonth();
-        // dates['en']['months'].forEach(
-        dates['en']['monthsShort'].forEach(
-            function(elt, index) {
-                content +=
-                "<option value='" + index + "'>" +
-                    elt +
-                "</option>";
-            });
-        return begin + content + end;
-    }
-
-    function getSelectYears() {
-        begin = "<select class='select-years'>";
-        content = "";
-        end = "</select>"
-
-        return begin + content + end;
-    }
 
     /* DATEPICKER NO CONFLICT
     * =================== */

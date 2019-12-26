@@ -30,22 +30,22 @@ The returned object can contains the following:
 
 ```php
 echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::classname(), [
-  'type' => 'date',
-  'options' => [
-    'id' => 'myDate',
-  ],
-  'autoWidget' => true,
-  'widgetOptions' => [
-    'options' => [
-      //Options here...
-    ],
-    'pluginOptions' => [
-      'selectable' => false,
-    ],
-    'pluginEvents' => [
-      //Events here...
-    ]
-  ]
+	'type' => 'date',
+	'options' => [
+		'id' => 'myDate',
+	],
+	'autoWidget' => true,
+	'widgetOptions' => [
+		'options' => [
+			//Options here...
+		],
+		'pluginOptions' => [
+			'selectable' => false,
+		],
+		'pluginEvents' => [
+			//Events here...
+		]
+	]
 ]);
 ```
 

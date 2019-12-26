@@ -1051,6 +1051,8 @@
                         tooltip = before.tooltip;
                     if (before.content)
                         content = before.content;
+                    if (before.event)
+                        clsName.push(this.o.eventCls);
                 }
 
                 //Check if uniqueSort exists (supported by jquery >=1.12 and >=2.2)
@@ -1832,7 +1834,8 @@
             leftArrow: '&#x00AB;',
             rightArrow: '&#x00BB;'
         },
-        showWeekDays: true
+        showWeekDays: true,
+        eventCls: ''
     };
     var locale_opts = $.fn.datepicker.locale_opts = [
         'format',

@@ -1,78 +1,121 @@
-<h1 align="center">
-    <a href="http://demos.krajee.com" title="Krajee Demos" target="_blank">
-        <img src="http://kartik-v.github.io/bootstrap-fileinput-samples/samples/krajee-logo-b.png" alt="Krajee Logo"/>
-    </a>
-    <br>
-    yii2-widget-datepicker
-    <hr>
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DTP3NZQ6G2AYU"
-       title="Donate via Paypal" target="_blank">
-        <img src="http://kartik-v.github.io/bootstrap-fileinput-samples/samples/donate.png" alt="Donate"/>
-    </a>
-</h1>
+# Pixium DatePicker
 
-[![Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Untable Version](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/v/unstable)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![License](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/license)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/daily)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+### This widget is a slighlty different version of Kartik's DatePicker.
+### You can check it on Kartik's github [here](/kartik-v/yii2-widget-datepicker).
 
-The DatePicker widget is a Yii 2 wrapper for the [Bootstrap DatePicker plugin](http://eternicode.github.io/bootstrap-datepicker) with various enhancements. The plugin is a fork of Stefan Petre's DatePicker (of eyecon.ro), with improvements by @eternicode. The widget is specially styled for Bootstrap 3 and Bootstrap 4 for Yii 2 Framework. The widget allows graceful degradation to a normal HTML text input, if the browser does not support JQuery. The widget supports these markups:
+## What is different  ?
+### PluginOptions
+The `pluginOptions` parameter can have the following fields:
+- `eventCls`: _string_, the class associated to a cell when `beforeShowDay`, `beforeShowMonth` etc. are called and return `event` 
+- `selectable`: _boolean_, wether the month and years are selected with a `<select>` tag or not
 
-* Simple Input Markup
-* Component Markup - Addon Prepended
-* Component Markup - Addon Appended
-* Inline / Embedded Markup
-* Date Range Markup (from and to dates)
-* Solo Button Markup
-
-> NOTE: This extension is a sub repo split of [yii2-widgets](https://github.com/kartik-v/yii2-widgets). The split has been done since 08-Nov-2014 to allow developers to install this specific widget in isolation if needed. One can also use the extension the previous way with the whole suite of [yii2-widgets](http://demos.krajee.com/widgets).
-
-## Installation
-
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/). Check the [composer.json](https://github.com/kartik-v/yii2-widget-datepicker/blob/master/composer.json) for this extension's requirements and dependencies. Read this [web tip /wiki](http://webtips.krajee.com/setting-composer-minimum-stability-application/) on setting the `minimum-stability` settings for your application's composer.json.
-
-To install, either run
-
+### BeforeShowDay
+returning `boolean` can now also mean if the day has an event or not. Therefore, in order to use `event`, an object should always be returned.
+The returned object can contains the following:
+```js
+    return {
+        enabled: boolean,
+        classes: string,
+        tooltip: tooltip,
+        content: string,
+        event: boolean
+    }
 ```
-$ php composer.phar require kartik-v/yii2-widget-datepicker "@dev"
-```
-
-or add
-
-```
-"kartik-v/yii2-widget-datepicker": "@dev"
-```
-
-to the `require` section of your `composer.json` file.
-
-## Release Changes
-
-> NOTE: Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-datepicker/blob/master/CHANGE.md) for details on changes to various releases.
-
-## Demo
-
-You can refer detailed [documentation and demos](http://demos.krajee.com/widget-details/datepicker) on usage of the extension.
 
 ## Usage
 
-```php
-use kartik\date\DatePicker;
+### -Selecatble is __not set__  or set on __`false`__
 
-// usage without model
-echo '<label>Check Issue Date</label>';
-echo DatePicker::widget([
-	'name' => 'check_issue_date', 
-	'value' => date('d-M-Y', strtotime('+2 days')),
-	'options' => ['placeholder' => 'Select issue date ...'],
-	'pluginOptions' => [
-		'format' => 'dd-M-yyyy',
-		'todayHighlight' => true
-	]
+<img src="README.assets/image-20191226144512075.png" width="300px">
+
+```php
+echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::classname(), [
+					'type' => 'date',
+          'options' => [
+						'id' => 'myDate',
+					],
+					'autoWidget' => true,
+					'widgetOptions' => [
+						'options' => [
+              //Options here...
+						],
+						'pluginOptions' => [
+							'selectable' => false,
+						],
+						'pluginEvents' => [
+              //Events here...
+						]
+					]
 ]);
 ```
 
-## License
 
-**yii2-widget-datepicker** is released under the BSD 3-Clause License. See the bundled `LICENSE.md` for details.
+
+### -Selecatble is set on __`true`__
+
+<img src="README.assets/image-20191226145144051.png" width="300px">
+
+```php
+echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::classname(), [
+					'type' => 'date',
+          'options' => [
+						'id' => 'myDate',
+					],
+					'autoWidget' => true,
+					'widgetOptions' => [
+						'options' => [
+              //Options here...
+						],
+						'pluginOptions' => [
+							'selectable' => true,
+						],
+						'pluginEvents' => [
+              //Events here...
+						]
+					]
+]);
+```
+
+
+
+### - eventCls is set and beforeShowDay returns `event`
+
+<img src="README.assets/image-20191226145554846.png" width="300px">
+
+```js
+function magic(date) {
+		if (/*Condition*/) {
+			return {
+				event: true
+			};
+		}
+}
+```
+
+
+
+```php
+$myExpression = new JsExpression('function(date) { return magic(date); }');
+
+echo $form->field($model, 'from')->widget(kartik\datecontrol\DateControl::classname(), [
+					'type' => 'date',
+  				'options' => [
+						'id' => 'fromDate',
+					],
+					'autoWidget' => true,
+					'widgetOptions' => [
+						'options' => [
+              //Options here...
+						],
+						'pluginOptions' => [
+							'beforeShowDay' => $myExpression,
+							'eventCls' => 'green-circle',
+              'selectable' => true,
+						],
+						'pluginEvents' => [
+              //Plugin events here...
+						]
+					]
+]);
+```
+

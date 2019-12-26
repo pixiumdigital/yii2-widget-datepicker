@@ -379,12 +379,13 @@
                 ];
             }
             this._events.push(
+                //Pixium: prevent select to blur
                 // Component: listen for blur on element descendants
-                [this.element, '*', {
-                    blur: $.proxy(function (e) {
-                        this._focused_from = e.target;
-                    }, this)
-                }],
+                // [this.element, '*', {
+                //     blur: $.proxy(function (e) {
+                //         this._focused_from = e.target;
+                //     }, this)
+                // }],
                 // Input: listen for blur on element
                 [this.element, {
                     blur: $.proxy(function (e) {
@@ -411,6 +412,14 @@
                 }],
                 [this.picker, '.day:not(.disabled)', {
                     click: $.proxy(this.dayCellClick, this)
+                }],
+                //Pixium: add event on select month change.
+                [this.picker, '.select-months', {
+                    change: $.proxy(this.selectMonth, this)
+                }],
+                //Pixium: add event on select year change.
+                [this.picker, '.select-years', {
+                    change: $.proxy(this.selectYears, this)
                 }],
                 [$(window), {
                     resize: $.proxy(this.place, this)
@@ -811,6 +820,11 @@
                 this.element.change();
             }
 
+            //Pixium: Force reset years in .select-years
+            this.set_selectYears(this.viewDate.getUTCFullYear());
+            //Pixium: Force reset of month value in .select-months
+            this.picker.find(".select-months").val(this.viewDate.getUTCMonth());
+
             this.fill();
             return this;
         },
@@ -985,6 +999,7 @@
                 .css('display', typeof this.o.title === 'string' && this.o.title !== '' ? 'table-cell' : 'none');
             this.updateNavArrows();
             this.fillMonths();
+
             var prevMonth = UTCDate(year, month, 0),
                 day = prevMonth.getUTCDate();
             prevMonth.setUTCDate(day - (prevMonth.getUTCDay() - this.o.weekStart + 7) % 7);
@@ -1236,10 +1251,19 @@
             if (this.o.updateViewDate) {
                 if (date.getUTCFullYear() !== this.viewDate.getUTCFullYear()) {
                     this._trigger('changeYear', this.viewDate);
+
+                    //Pixium:
+                    //      - change .select-months value
+                    //      - update options in select
+                    $selectYears = $(this.picker).find(".select-years");
+                    this._update_selectYears(date.getUTCFullYear() - this.viewDate.getUTCFullYear(), $selectYears);
+                    $selectYears.val(date.getUTCFullYear());
                 }
 
                 if (date.getUTCMonth() !== this.viewDate.getUTCMonth()) {
                     this._trigger('changeMonth', this.viewDate);
+                    //Pixium: change .select-months value
+                    $(this.picker).find(".select-months").val(date.getUTCMonth());
                 }
             }
             this._setDate(date);
@@ -1252,9 +1276,98 @@
             if (this.viewMode !== 0) {
                 dir *= DPGlobal.viewModes[this.viewMode].navStep * 12;
             }
+
+            //Pixium:
+            //      - Update select-month and select-year values
+            //      - if, while navigate, the year change, update the .select-years value
+            //      - update .select-months value
+            month_value = (this.viewDate.getMonth() + dir) % 12;
+            if (month_value < 0) month_value += 12;
+
+            if ((month_value == 0 && dir == 1) || (month_value == 11 && dir == -1)) {
+                $selectYears = this.picker.find(".select-years");
+                year_value = parseInt($selectYears.val());
+                $selectYears.val(year_value + dir);
+                this._update_selectYears(dir, $selectYears);
+            }
+
+            $selectMonths = this.picker.find(".select-months");
+            $selectMonths.val(month_value);
+
             this.viewDate = this.moveMonth(this.viewDate, dir);
             this._trigger(DPGlobal.viewModes[this.viewMode].e, this.viewDate);
             this.fill();
+        },
+
+        //Pixium:
+        //      - based on navArrowsClick functioning
+        //      - Called when .select-months change.
+        //      - update its value
+        //      - update whole calendar
+        selectMonth: function (e) {
+            var $target = $(e.currentTarget);
+            var delta = $target.val() - this.viewDate.getMonth();
+            this.viewDate = this.moveMonth(this.viewDate, delta);
+            this._trigger(DPGlobal.viewModes[this.viewMode].e, this.viewDate);
+            this.fill();
+        },
+
+        //Pixium:
+        //      - based on navArrowsClick functioning
+        //      - Called when .select-years change.
+        //      - update its value
+        //      - update whole calendar
+        selectYears: function (e) {
+            var $target = $(e.currentTarget);
+            var delta = $target.val() - this.viewDate.getUTCFullYear();
+
+            this._update_selectYears(delta, $target);
+
+            this.viewDate = this.moveYear(this.viewDate, delta);
+            this._trigger(DPGlobal.viewModes[this.viewMode].e, this.viewDate);
+            this.fill();
+        },
+
+        //Pixium:
+        /**
+         * If delta is negative, remove the delta last options form target and prepend delta years before the first option
+         * If delta is positive, remove the delta first options form target and append delta years after the last option
+         * @param {int} delta The number of years shifting
+         * @param {*} $target
+         */
+        _update_selectYears: function(delta, $target) {
+            $.fn.addYear = $.fn.append;
+            dir = delta > 0;
+            year = this.viewDate.getUTCFullYear();
+
+            if (!dir) {
+                $.fn.addYear = $.fn.prepend;
+                dir = -1;
+                $target.find('option').slice(delta).remove();
+            } else {
+                $target.find('option').slice(0, delta).remove();
+            }
+
+            for (i = 0; i != delta; i += dir) {
+                value = year + dir * 10  + i + dir;
+                option = "<option>" + value + "</option>";
+                $target.addYear(option);
+            }
+        },
+
+        //Pixium:
+        /**
+         * Take a year, add the ten years before, the year and the ten years after as <option> to .select-years
+         * @param {int} year The utf full year from this.viewDate.
+         */
+        set_selectYears: function(year) {
+            $selectYears = this.picker.find(".select-years");
+            $selectYears.find('option').remove();
+            console.error(year);
+            for (i = year - 10; i < year + 11; i++) {
+                console.warn(i);
+                $selectYears.append("<option" + (i == year ? " selected" : "") + ">" + i + "</option>");
+            }
         },
 
         _toggle_multidate: function (date) {
@@ -1949,7 +2062,14 @@
         '</tr>' +
         '<tr>' +
         '<th class="prev">' + defaults.templates.leftArrow + '</th>' +
-        '<th colspan="5" class="datepicker-switch"></th>' +
+//Pixium: change template, add selects for months and years
+        '<th colspan="3">' +
+            getSelectMonths() +
+        '</th>' +
+        '<th colspan="2">' +
+            getSelectYears() +
+        '</th>' +
+//---------------
         '<th class="next">' + defaults.templates.rightArrow + '</th>' +
         '</tr>' +
         '</thead>',
@@ -2003,6 +2123,31 @@
 
     $.fn.datepicker.DPGlobal = DPGlobal;
 
+    //Pixium:
+    //      - Generate month options for template
+    function getSelectMonths() {
+        begin = "<select class='select-months'>";
+        content = "";
+        end = "</select>"
+        month = new Date().getMonth();
+        // dates['en']['months'].forEach(
+        dates['en']['monthsShort'].forEach(
+            function(elt, index) {
+                content +=
+                "<option value='" + index + "'>" +
+                    elt +
+                "</option>";
+            });
+        return begin + content + end;
+    }
+
+    function getSelectYears() {
+        begin = "<select class='select-years'>";
+        content = "";
+        end = "</select>"
+
+        return begin + content + end;
+    }
 
     /* DATEPICKER NO CONFLICT
     * =================== */

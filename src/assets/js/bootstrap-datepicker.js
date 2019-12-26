@@ -1363,9 +1363,7 @@
         set_selectYears: function(year) {
             $selectYears = this.picker.find(".select-years");
             $selectYears.find('option').remove();
-            console.error(year);
             for (i = year - 10; i < year + 11; i++) {
-                console.warn(i);
                 $selectYears.append("<option" + (i == year ? " selected" : "") + ">" + i + "</option>");
             }
         },

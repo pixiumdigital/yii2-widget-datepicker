@@ -30,22 +30,22 @@ The returned object can contains the following:
 
 ```php
 echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::classname(), [
-					'type' => 'date',
-          'options' => [
-						'id' => 'myDate',
-					],
-					'autoWidget' => true,
-					'widgetOptions' => [
-						'options' => [
-              //Options here...
-						],
-						'pluginOptions' => [
-							'selectable' => false,
-						],
-						'pluginEvents' => [
-              //Events here...
-						]
-					]
+  'type' => 'date',
+  'options' => [
+    'id' => 'myDate',
+  ],
+  'autoWidget' => true,
+  'widgetOptions' => [
+    'options' => [
+      //Options here...
+    ],
+    'pluginOptions' => [
+      'selectable' => false,
+    ],
+    'pluginEvents' => [
+      //Events here...
+    ]
+  ]
 ]);
 ```
 
@@ -57,22 +57,22 @@ echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::class
 
 ```php
 echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::classname(), [
-					'type' => 'date',
-          'options' => [
-						'id' => 'myDate',
-					],
-					'autoWidget' => true,
-					'widgetOptions' => [
-						'options' => [
-              //Options here...
-						],
-						'pluginOptions' => [
-							'selectable' => true,
-						],
-						'pluginEvents' => [
-              //Events here...
-						]
-					]
+	'type' => 'date',
+	'options' => [
+		'id' => 'myDate',
+	],
+	'autoWidget' => true,
+	'widgetOptions' => [
+		'options' => [
+			//Options here...
+		],
+		'pluginOptions' => [
+			'selectable' => true,
+		],
+		'pluginEvents' => [
+			//Events here...
+		]
+	]
 ]);
 ```
 
@@ -84,11 +84,11 @@ echo $form->field($model, 'field')->widget(kartik\datecontrol\DateControl::class
 
 ```js
 function magic(date) {
-		if (/*Condition*/) {
-			return {
-				event: true
-			};
-		}
+	if (/*Condition*/) {
+		return {
+			event: true
+		};
+	}
 }
 ```
 
@@ -98,24 +98,24 @@ function magic(date) {
 $myExpression = new JsExpression('function(date) { return magic(date); }');
 
 echo $form->field($model, 'from')->widget(kartik\datecontrol\DateControl::classname(), [
-					'type' => 'date',
-  				'options' => [
-						'id' => 'fromDate',
-					],
-					'autoWidget' => true,
-					'widgetOptions' => [
-						'options' => [
-              //Options here...
-						],
-						'pluginOptions' => [
-							'beforeShowDay' => $myExpression,
-							'eventCls' => 'green-circle',
-              'selectable' => true,
-						],
-						'pluginEvents' => [
-              //Plugin events here...
-						]
-					]
+	'type' => 'date',
+	'options' => [
+		'id' => 'fromDate',
+	],
+	'autoWidget' => true,
+	'widgetOptions' => [
+		'options' => [
+			//Options here...
+		],
+		'pluginOptions' => [
+			'beforeShowDay' => $myExpression,
+			'eventCls' => 'green-circle',
+			'selectable' => true,
+		],
+		'pluginEvents' => [
+			//Plugin events here...
+		]
+	]
 ]);
 ```
 
